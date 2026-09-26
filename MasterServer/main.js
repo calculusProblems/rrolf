@@ -34,7 +34,10 @@ const PASSWORD_SALT = process.env["PASSWORD_SALT"] || "";
 const CLOUD_TOKEN = "cloud.eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.CKOM_-XtMRCjtLqo-DAaEgoQjUflOmYrT3Sv5ckk4-Nk0yIWOhQKEgoQ6l7BiqssS-iYCw6PaqKKnA.Pgw_qDBaugBIFd7ilYcbbm_6yPNDeqreiDi1VBkKX84ER7CXvS-8abNuRhKtU_hDtgT9Sd4a7JWN68fdLnEKCA";
 const NAMESPACE_ID = "04cfba67-e965-4899-bcb9-b7497cc6863b";
 const SERVER_SECRET = "ad904nf3adrgnariwpanyf3qap8unri4t9b384wna3g34ytgdr4bwtvd4y";
-const CLIENT_ID = "1453525695228678349";
+
+//TODO: CAHNGE BACK TO REAL AND ALSO SET OAUT_REDIRECT_URI to rysteria.pro
+const CLIENT_ID = "1242286155320393859";
+const OAUTH_REDIRECT_URI = process.env["OAUTH_REDIRECT_URI"] || "https://game.parshwa.blog";
 const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
 const BOT_TOKEN = process.env["BOT_TOKEN"] || "";
 const MAX_PETAL_COUNT = 28;
@@ -290,7 +293,7 @@ async function discord_oauth2(code) {
         body: new URLSearchParams({
             "grant_type": "authorization_code",
             "code": code,
-            "redirect_uri": "https://rysteria.pro/",
+            "redirect_uri": OAUTH_REDIRECT_URI,
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET
         })
@@ -424,10 +427,31 @@ const wss = new WSS.Server({server});
 const game_servers = {};
 const connected_clients = {};
 
+function kick_from_other_servers(username, new_server)
+{
+    const previous = connected_clients[username];
+    if (!previous || previous.server === new_server.alias)
+        return;
+    const old_server = game_servers[previous.server];
+    if (!old_server)
+        return;
+    const pos = old_server.clients.indexOf(username);
+    if (pos === -1)
+        return; // already left that server
+    log("kick from old server", [username, old_server.alias, new_server.alias]);
+    const encoder = new protocol.BinaryWriter();
+    encoder.WriteUint8(2); // force disconnect: slot, then the nonce to make sure it's the same connection
+    encoder.WriteUint8(pos);
+    encoder.WriteVarUint(previous.nonce);
+    old_server.ws.send(encoder.data.subarray(0, encoder.at));
+    old_server.clients[pos] = 0;
+}
+
 wss.on("connection", (ws, req) => {
     if (req.url !== `/api/${SERVER_SECRET}`)
        return ws.close();
     const game_server = new GameServer();
+    game_server.ws = ws;
     game_server[game_server.alias] = game_server;
     ws.on('message', async (message) => {
         const data = new Uint8Array(message);
@@ -473,6 +497,7 @@ wss.on("connection", (ws, req) => {
                     }
                     user.password = hash(user.username + PASSWORD_SALT);
                     write_db_entry(user.username, user);
+                    kick_from_other_servers(user.username, game_server);
                     connected_clients[user.username] = new GameClient(user, game_server.alias, nonce, await discord_name(user.discord_id));
                     game_server.clients[pos] = user.username;
                     const encoder = new protocol.BinaryWriter();

@@ -61,6 +61,7 @@ static void set_special_zone(uint8_t biome, uint8_t (*fun)(), uint32_t x,
 
 #define ALL_MOBS 255
 #define DIFFICULT_MOBS 254
+#define NO_MOBS 253
 
 uint8_t fern_tree_zone()
 {
@@ -147,13 +148,27 @@ static struct zone zone_positions[ZONE_POSITION_COUNT] = {
     {26, 6,  3,  4, pter_edmo_zone},
 };
 
+#define PVP_ZONE_POSITION_COUNT 1
+
+static struct zone pvp_zone_positions[PVP_ZONE_POSITION_COUNT] = {
+};
+
 static void set_spawn_zones()
 {
-    for (uint64_t i = 0; i < ZONE_POSITION_COUNT; i++)
+    struct zone *zones = zone_positions;
+    uint64_t count = ZONE_POSITION_COUNT;
+    uint8_t biome = rr_biome_id_hell_creek;
+    if (RR_GLOBAL_BIOME == rr_biome_id_pvp)
     {
-        struct zone zone = zone_positions[i];
-        set_special_zone(rr_biome_id_hell_creek, zone.spawn_func, zone.x, zone.y,
-                         zone.w, zone.h);
+        zones = pvp_zone_positions;
+        count = PVP_ZONE_POSITION_COUNT;
+        biome = rr_biome_id_pvp;
+    }
+    for (uint64_t i = 0; i < count; i++)
+    {
+        struct zone zone = zones[i];
+        set_special_zone(biome, zone.spawn_func, zone.x, zone.y, zone.w,
+                         zone.h);
     }
 }
 
@@ -236,8 +251,18 @@ static void spawn_mob(struct rr_simulation *this, uint32_t grid_x,
                     break;
             }
     }
+    else if (RR_GLOBAL_BIOME == rr_biome_id_pvp)
+    {
+        grid->spawn_timer = 0;
+        return;
+    }
     else
         id = get_spawn_id(RR_GLOBAL_BIOME, grid);
+    if (id == NO_MOBS)
+    {
+        grid->spawn_timer = 0;
+        return;
+    }
     uint8_t rarity =
         get_spawn_rarity(grid->difficulty + grid->local_difficulty * 0);
     if (!should_spawn_at(id, rarity))

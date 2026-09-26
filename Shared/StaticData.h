@@ -86,6 +86,7 @@ enum rr_dev_cheat_type
 enum rr_biome_id
 {
     rr_biome_id_hell_creek,
+    rr_biome_id_pvp,
     rr_biome_id_garden,
     rr_biome_id_beehive,
     rr_biome_id_max
@@ -237,6 +238,7 @@ extern double RR_MOB_WAVE_RARITY_COEFFICIENTS[rr_rarity_id_max + 1];
 
 extern uint32_t RR_MOB_DIFFICULTY_COEFFICIENTS[rr_mob_id_max];
 extern double RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max];
+extern double RR_PVP_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max];
 extern double RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max];
 
 extern uint32_t RR_RARITY_COLORS[rr_rarity_id_max];
@@ -289,8 +291,27 @@ struct rr_maze_declaration
 // RR_DECLARE_MAZE(HELL_CREEK, 54)
 RR_DECLARE_MAZE(HELL_CREEK, 80)
 RR_DECLARE_MAZE(BURROW, 4)
+RR_DECLARE_MAZE(PVP, 80)
 
 extern struct rr_maze_declaration RR_MAZES[rr_biome_id_max];
+
+// where each biome's game server lives. one server process runs one biome, the
+// main menu's biome buttons connect the client to the matching entry. this is
+// the one place to change when a server moves
+struct rr_biome_server
+{
+    // where non rivet clients connect. NULL means the same host the page came
+    // from on the usual port, which is what a single server setup needs
+    char const *ws_url;
+    // port the server listens on, so a hell creek and a pvp server can run side
+    // by side. rivet still maps it to a public address itself
+    uint16_t port;
+    // rivet builds ask rivet's matchmaker for a lobby in this game mode instead
+    // of using ws_url
+    char const *rivet_game_mode;
+};
+
+extern struct rr_biome_server RR_BIOME_SERVERS[rr_biome_id_max];
 
 extern uint8_t RR_GLOBAL_BIOME;
 

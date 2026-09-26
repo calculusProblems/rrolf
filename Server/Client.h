@@ -96,6 +96,7 @@ struct rr_server_client
 };
 
 void rr_server_client_init(struct rr_server_client *);
+uint8_t rr_server_client_is_dev_account(char const *uuid);
 void rr_server_client_create_flower(struct rr_server_client *);
 
 void rr_server_client_write_message(struct rr_server_client *, uint8_t *,

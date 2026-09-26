@@ -41,9 +41,9 @@ void rr_discord_oauth2_link_account() {
     EM_ASM({
         const state = crypto.randomUUID();
         const url = new URL("https://discord.com/oauth2/authorize");
-        url.searchParams.set("client_id", "1453525695228678349");
+        url.searchParams.set("client_id", "1242286155320393859");
         url.searchParams.set("response_type", "code");
-        url.searchParams.set("redirect_uri", window.location.origin + window.location.pathname);
+        url.searchParams.set("redirect_uri", window.location.origin + (window.location.pathname === "/" ? "" : window.location.pathname));
         url.searchParams.set("scope", "identify guilds.join");
         url.searchParams.set("state", state);
         window.localStorage["oauth2_state"] = state;

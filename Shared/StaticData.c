@@ -185,6 +185,22 @@ double RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max] = {
     75,   //quetz
     25,   //edmo
 };
+
+double RR_PVP_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max] = {
+    0,   //tric
+    0,   //trex
+    0,   //fern
+    1,   //tree
+    0,   //pter
+    0,   //dako
+    0,   //pachy
+    0,   //ornith
+    0,   //anky
+    0,   //meteor
+    0,   //quetz
+    0,   //edmo
+};
+
 double RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 10};
 
 struct rr_petal_rarity_scale RR_PETAL_RARITY_SCALE[rr_rarity_id_max] = {
@@ -262,6 +278,8 @@ static void init_game_coefficients()
     {
         RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[mob] +=
             RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[mob - 1];
+        RR_PVP_MOB_ID_RARITY_COEFFICIENTS[mob] +=
+            RR_PVP_MOB_ID_RARITY_COEFFICIENTS[mob - 1];
         RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[mob] +=
             RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[mob - 1];
     }
@@ -269,6 +287,8 @@ static void init_game_coefficients()
     {
         RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[mob] /=
             RR_HELL_CREEK_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max - 1];
+        RR_PVP_MOB_ID_RARITY_COEFFICIENTS[mob] /=
+            RR_PVP_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max - 1];
         RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[mob] /=
             RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max - 1];
     }
@@ -451,6 +471,7 @@ void rr_static_data_init()
     init_game_coefficients();
     init(HELL_CREEK);
     init(BURROW);
+    init(PVP);
 #ifdef RR_SERVER
     print_chances(1);  // c
     print_chances(4);  // C
@@ -556,6 +577,51 @@ RR_DEFINE_MAZE(HELL_CREEK, 80) = {
 {_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_}, // 39
 };
 // clang-format on
+// the pvp map, made in the map editor and turned into this by scripts/import-map.py
+RR_DEFINE_MAZE(PVP, 80) = {
+//                     11  13  15  17  19  21  23  25  27  29  31  33  35  37  39
+// 1 2 3 4 5 6 7 8 9 10  12  14  16  18  20  22  24  26  28  30  32  34  36  38
+{_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_}, // 0
+{_,_,_,_,_,c,c,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_}, // 1
+{_,_,_,c,c,c,c,c,_,_,c,c,c,_,_,_,_,_,c,c,c,_,_,_,_,_,c,_,_,_,_,c,c,c,c,c,c,_,_,_}, // 2
+{_,_,c,c,c,c,c,c,_,c,c,c,c,c,c,_,_,_,c,c,c,c,c,_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_}, // 3
+{_,_,_,c,c,c,c,c,_,_,c,c,c,c,c,c,_,c,c,c,c,c,_,_,c,c,c,_,_,c,c,c,_,c,c,c,c,c,c,_}, // 4
+{_,c,_,c,c,c,c,c,c,_,_,c,c,c,c,c,_,c,c,c,c,_,_,c,c,c,_,_,_,_,c,c,_,_,_,_,c,c,c,_}, // 5
+{_,c,_,_,c,c,c,c,c,c,_,c,c,c,c,c,_,_,c,c,_,_,c,c,c,_,_,c,c,_,_,c,c,c,c,_,_,_,_,_}, // 6
+{_,c,c,_,_,_,c,_,_,_,_,_,_,c,c,_,_,_,c,c,c,c,c,c,_,_,c,c,c,c,_,c,c,c,c,c,c,_,_,_}, // 7
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,_,_,c,c,c,c,c,c,_,_}, // 8
+{_,c,c,c,c,c,c,c,_,_,_,_,_,_,_,_,_,_,_,_,_,c,c,c,c,c,c,c,c,c,c,_,c,c,c,c,c,c,_,_}, // 9
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,_,_,_,c,c,c,_,_,_,_,_,_,_,_,_,c,c,_,c,c,c,c,c,c,_,_}, // 10
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,c,c,c,c,c,c,_,_,_,_,c,c,c,c,c,c,_,_}, // 11
+{_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,c,c,c,_,_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,_}, // 12
+{_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,c,_,_,_,c,_,_,_,c,c,_,_,_,_,c,c,c,c,c,c,_,_}, // 13
+{_,_,_,c,c,c,c,c,c,c,c,c,c,c,c,_,_,c,_,_,c,c,c,c,c,_,c,_,_,c,c,_,_,c,c,c,c,_,_,_}, // 14
+{_,c,_,_,c,c,c,c,c,c,c,c,c,_,_,_,_,c,c,c,c,c,c,c,c,_,c,_,c,c,c,c,_,_,c,c,c,_,c,_}, // 15
+{_,c,c,_,_,c,c,c,c,c,c,_,_,_,c,c,_,c,_,c,c,c,c,c,c,_,_,_,c,c,c,c,c,_,_,_,_,_,c,_}, // 16
+{_,c,c,c,_,_,c,c,c,c,_,_,c,c,c,c,_,c,_,c,c,c,c,c,_,_,_,c,c,c,c,c,_,_,c,c,c,c,c,_}, // 17
+{_,c,c,c,c,_,_,c,c,_,_,c,c,c,c,c,_,c,_,c,c,c,_,_,_,c,c,c,_,_,_,_,_,c,c,c,c,c,c,_}, // 18
+{_,c,c,c,c,c,_,c,c,_,c,c,c,c,c,c,_,c,_,c,_,_,_,c,c,c,c,_,_,c,c,c,c,c,c,c,c,c,c,_}, // 19
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,_,_,c,c,c,c,c,_,_,c,c,_,_,c,c,c,c,c,c,c,_}, // 20
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,c,c,c,c,c,c,_,_,_,c,c,c,c,_,c,c,c,c,c,c,c,_}, // 21
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,_,_,_,_,_,_,c,_,c,c,c,c,_,_,c,c,c,c,c,c,_}, // 22
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,_,_,_,_,c,_,c,c,c,c,c,c,c,_,c,c,c,c,c,c,_}, // 23
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,_,c,c,_,_,_,c,_,c,c,c,c,c,_,c,c,c,c,c,c,_}, // 24
+{_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,c,c,c,c,c,_,_,_,c,c,c,c,c,_,_,_,c,_,_,c,_}, // 25
+{_,_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,_,c,c,c,c,c,c,c,c,c,_,c,c,c,_,_,_,c,c,c,c,_,c,_}, // 26
+{_,_,_,_,c,c,c,c,c,c,c,c,c,c,c,c,_,c,_,_,_,c,c,c,c,c,_,_,_,_,_,c,c,c,c,c,c,_,_,_}, // 27
+{_,_,_,_,_,c,c,c,c,c,c,c,c,c,c,_,_,c,c,c,_,_,c,c,c,_,_,c,c,_,_,c,c,c,c,c,c,c,c,_}, // 28
+{_,_,_,_,_,_,c,c,c,c,c,c,c,_,_,_,c,c,c,c,c,_,_,_,_,_,c,c,c,c,_,_,_,c,c,c,c,c,c,_}, // 29
+{_,_,_,c,c,_,_,_,_,c,c,c,_,_,_,c,c,c,c,c,c,c,_,c,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,_}, // 30
+{_,_,c,c,c,c,c,c,_,_,c,c,_,c,_,c,c,c,c,c,c,_,_,c,c,c,c,c,c,c,c,c,_,_,c,_,_,_,c,_}, // 31
+{_,c,c,c,c,c,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,_,c,c,c,c,c,c,c,c,c,_,_,c,c,c,c,_,_,_}, // 32
+{_,c,c,c,c,c,c,c,c,c,_,c,c,c,c,_,_,c,c,_,_,_,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,c,_,_}, // 33
+{_,c,c,c,c,c,c,c,c,_,_,c,c,c,c,c,_,_,_,_,c,_,_,_,c,c,c,c,c,c,_,c,c,c,c,c,c,c,_,_}, // 34
+{_,_,c,c,c,c,c,c,c,_,c,c,c,c,c,c,_,_,c,c,c,c,c,_,_,_,c,c,_,_,_,c,c,c,c,c,c,c,c,_}, // 35
+{_,_,_,c,c,c,c,c,_,_,c,c,c,c,c,c,c,_,_,c,c,c,c,c,c,_,c,c,_,c,c,c,c,c,c,c,c,c,c,_}, // 36
+{_,_,_,_,c,c,_,_,_,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,c,_}, // 37
+{_,_,_,_,_,_,_,c,c,c,c,c,c,c,c,_,_,_,_,c,c,c,c,c,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_}, // 38
+{_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_}, // 39
+};
 RR_DEFINE_MAZE(BURROW, 4) = {{1, 1}, {0, 1}};
 
 #define MAZE_ENTRY(MAZE, GRID_SIZE)                                            \
@@ -574,9 +640,28 @@ struct rr_maze_declaration RR_MAZES[rr_biome_id_max] = {
         {1,  37, 2, 2, 1,  38, 100}, // 7
         {4,  24, 2, 2, 5,  25, 100}, // 8
     }},
+    {MAZE_ENTRY(PVP, 1024), 1,
+        {26, 13, 3, 3, 29, 16, 1},
+    },
     {MAZE_ENTRY(HELL_CREEK, 1024), 0},
     {MAZE_ENTRY(BURROW, 512), 0},
 };
+
+#ifdef RIVET_BUILD
+struct rr_biome_server RR_BIOME_SERVERS[rr_biome_id_max] = {
+    {"wss://default.rysteria.pro",   1234,   "Hell Creek"}, // hell creek
+    {"wss://pvp.rysteria.pro",       1235,          "pvp"}, // pvp
+    {NULL,                              0,           NULL}, // garden, doesn't have a server
+    {NULL,                              0,           NULL},  // beehive, lives inside other arenas
+};
+#else
+struct rr_biome_server RR_BIOME_SERVERS[rr_biome_id_max] = {
+    {"ws://localhost:1234", 1234, "Hell Creek"}, // hell creek
+    {"ws://localhost:1235", 1235, "pvp"},        // pvp
+    {NULL,                  0,    NULL},         // garden, doesn't have a server
+    {NULL,                  0,    NULL},         // beehive, lives inside other arenas
+};
+#endif
 
 uint8_t RR_GLOBAL_BIOME = rr_biome_id_hell_creek;
 #undef _

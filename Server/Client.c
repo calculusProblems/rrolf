@@ -252,6 +252,11 @@ void rr_server_client_craft_petal(struct rr_server_client *this,
                                    encoder.current - encoder.start);
 }
 
+uint8_t rr_server_client_is_dev_account(char const *uuid)
+{
+    return strcmp(uuid, "3d5eb10d-d3d3-49b1-ac43-befe4c98e1c0") == 0;
+}
+
 int rr_server_client_read_from_api(struct rr_server_client *this,
                                    struct rr_binary_encoder *encoder)
 {
@@ -264,6 +269,9 @@ int rr_server_client_read_from_api(struct rr_server_client *this,
     rr_binary_encoder_read_nt_string(encoder, this->rivet_account.token);
     rr_binary_encoder_read_nt_string(encoder, this->rivet_account.name);
     rr_binary_encoder_read_nt_string(encoder, this->rivet_account.id);
+#ifndef SANDBOX
+    this->dev = rr_server_client_is_dev_account(this->rivet_account.uuid);
+#endif
     if (this->dev)
     {
         this->checkpoint = 0;

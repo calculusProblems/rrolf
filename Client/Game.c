@@ -489,19 +489,19 @@ void rr_game_init(struct rr_game *this)
                                 rr_ui_join_button_init(),
                                 NULL
                             ),
-                            /*
-                            rr_ui_h_container_init(rr_ui_container_init(), 0, 10,
-                                rr_ui_biome_button_init("Hell Creek", 0xffff0000, 0),
-                                rr_ui_biome_button_init("Ocean", 0xffcdb423, 1),
-                                NULL
+                            rr_ui_flex_container_init(
+                                rr_ui_h_container_init(rr_ui_container_init(), 0, 10,
+                                    rr_ui_biome_button_init("Hell Creek", 0xffff0000, rr_biome_id_hell_creek),
+                                    rr_ui_biome_button_init("PVP", 0xff3a6ee0, rr_biome_id_pvp),
+                                    NULL
+                                ),
+                                rr_ui_h_container_init(rr_ui_container_init(), 0, 10,
+                                    rr_ui_create_squad_button_init(),
+                                    rr_ui_squad_button_init(),
+                                    NULL
+                                ),
+                                20
                             ),
-                            */
-                            rr_ui_set_justify(
-                                rr_ui_h_container_init(rr_ui_container_init(), 0, 10, 
-                                rr_ui_create_squad_button_init(),
-                                rr_ui_squad_button_init(),
-                                NULL
-                            ), 1, -1),
                             NULL
                         ),
                         rr_ui_set_background(
@@ -1658,7 +1658,8 @@ void rr_game_tick(struct rr_game *this, float delta)
                 rr_renderer_translate(this->renderer, newLeftX + GRID_SIZE / 2,
                                       currY + GRID_SIZE / 2);
                 rr_renderer_scale(this->renderer, (GRID_SIZE + 2) / 256);
-                if (this->selected_biome == 0)
+                if (this->selected_biome == rr_biome_id_hell_creek ||
+                    this->selected_biome == rr_biome_id_pvp)
                     rr_renderer_draw_tile_hell_creek(this->renderer,
                                                      tile_index);
                 else
@@ -1909,22 +1910,55 @@ void rr_game_tick(struct rr_game *this, float delta)
     this->input_data->prev_mouse_y = this->input_data->mouse_y;
 }
 
+// throws away the current connection, if there is one. this is what keeps a
+// client on only one server: every new connection starts by calling this
+static void rr_game_drop_socket(struct rr_game *this)
+{
+    rr_websocket_detach(&this->socket);
+    // the same cleanup that runs when the server closes on us, which also
+    // flags an error, so put the flag back to how it was
+    uint8_t socket_error = this->socket_error;
+    rr_game_websocket_on_event_function(rr_websocket_event_type_close, NULL,
+                                        this, 0);
+    this->socket_error = socket_error;
+    this->joined_squad = 0;
+}
+
 void rr_game_connect_socket(struct rr_game *this)
 {
+    rr_game_drop_socket(this);
     this->socket_ready = 0;
     this->simulation_ready = 0;
     this->socket_pending = 1;
 
+    struct rr_biome_server const *server = &RR_BIOME_SERVERS[this->connect_biome];
 #ifdef RIVET_BUILD
-    rr_rivet_lobbies_find(this, NULL);
+    rr_rivet_lobbies_find(this, NULL, server->rivet_game_mode);
 #else
     rr_websocket_init(&this->socket);
     this->socket.user_data = this;
     char url[128];
-    rr_dom_get_socket_url(url);
+    if (server->ws_url != NULL && strlen(server->ws_url) < sizeof url)
+        strcpy(url, server->ws_url);
+    else
+        rr_dom_get_socket_url(url);
     rr_websocket_connect_to(&this->socket, url);
     // rr_websocket_connect_to(&this->socket, "45.79.197.197", 1234, 0);
 #endif
+}
+
+void rr_game_select_biome(struct rr_game *this, uint8_t biome)
+{
+    if (biome >= rr_biome_id_garden || RR_BIOME_SERVERS[biome].port == 0)
+        return;
+    if (this->connect_biome == biome)
+        return;
+    this->connect_biome = biome;
+    rr_game_drop_socket(this);
+    this->socket_ready = 0;
+    this->simulation_ready = 0;
+    this->socket_pending = 0;
+    this->socket_error = 0;
 }
 
 struct on_find_captures
@@ -1944,8 +1978,7 @@ void rr_rivet_lobby_on_find(char *s, char *token, uint16_t port, void *_game)
         game->socket_ready = 0;
         return;
     }
-    // if (game->socket_ready)
-    // rr_websocket_disconnect(&game->socket, game);
+    rr_game_drop_socket(game);
     rr_websocket_init(&game->socket);
     game->socket.user_data = game;
     game->socket_pending = 1;

@@ -215,6 +215,7 @@ struct rr_game
     uint8_t menu_open;
     uint8_t ticks_until_text_cache;
     uint8_t selected_biome;
+    uint8_t connect_biome;
     uint8_t slots_unlocked;
     uint8_t cursor;
     uint8_t significant_rarity;
@@ -228,6 +229,7 @@ struct rr_game
 void rr_game_init(struct rr_game *);
 void rr_game_tick(struct rr_game *, float);
 void rr_game_connect_socket(struct rr_game *);
+void rr_game_select_biome(struct rr_game *, uint8_t);
 void rr_simulation_read_binary(struct rr_game *, struct proto_bug *);
 void rr_write_dev_cheat_packets(struct rr_game *, uint8_t);
 

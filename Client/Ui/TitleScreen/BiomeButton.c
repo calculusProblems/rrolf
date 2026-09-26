@@ -39,7 +39,7 @@ static void biome_button_on_event(struct rr_ui_element *this,
     if (game->input_data->mouse_buttons_up_this_tick & 1)
     {
         struct biome_button_metadata *data = this->data;
-        game->selected_biome = data->pos;
+        rr_game_select_biome(game, data->pos);
     }
 }
 
@@ -50,7 +50,7 @@ static void biome_button_on_render(struct rr_ui_element *this,
     struct rr_renderer *renderer = game->renderer;
     if (game->focused == this)
         renderer->state.filter.amount = 0.2;
-    if (game->selected_biome == data->pos)
+    if (game->connect_biome == data->pos)
         renderer->state.filter.amount = 0.4;
 
     this->abs_width =

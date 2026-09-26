@@ -46,7 +46,8 @@ RR_SERVER_ONLY(extern void rr_rivet_players_disconnected(
 RR_SERVER_ONLY(extern void rr_rivet_lobbies_set_closed(char const *lobby_token,
                                                        int closed);)
 RR_CLIENT_ONLY(extern void rr_rivet_lobbies_find(void *captures,
-                                                 char const *region);)
+                                                 char const *region,
+                                                 char const *game_mode);)
 RR_CLIENT_ONLY(extern void rr_rivet_lobbies_join(void *captures, char const *);)
 RR_CLIENT_ONLY(extern void rr_rivet_identities_create_guest(void *captures);)
 RR_CLIENT_ONLY(extern void rr_rivet_link_account(char *game_user,
