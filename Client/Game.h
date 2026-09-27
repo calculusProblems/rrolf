@@ -195,6 +195,7 @@ struct rr_game
     uint32_t failed_crafts[rr_petal_id_max][rr_rarity_id_max];
     uint8_t loadout_counts[rr_petal_id_max][rr_rarity_id_max];
     EntityIdx player_infos[RR_SQUAD_MEMBER_COUNT];
+    EntityIdx arena_player_infos[RR_MAX_CLIENT_COUNT];
     uint64_t dev_flag;
     float lerp_delta;
     uint16_t afk_ticks;

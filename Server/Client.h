@@ -84,7 +84,7 @@ struct rr_server_client
     char blocked_clients[RR_MAX_CLIENT_COUNT][37];
     uint8_t squad_pos;
     uint8_t squad;
-    uint8_t checkpoint;
+    uint8_t checkpoint[2];
     uint8_t received_first_packet : 1;
     uint8_t verified : 1;
     uint8_t dev : 1;
@@ -96,7 +96,6 @@ struct rr_server_client
 };
 
 void rr_server_client_init(struct rr_server_client *);
-uint8_t rr_server_client_is_dev_account(char const *uuid);
 void rr_server_client_create_flower(struct rr_server_client *);
 
 void rr_server_client_write_message(struct rr_server_client *, uint8_t *,

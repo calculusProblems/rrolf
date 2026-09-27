@@ -42,7 +42,8 @@
     X(slot_count, varuint)                                                     \
     X(squad_pos, uint8)                                                        \
     X(arena, varuint)                                                          \
-    X(spectate_target, varuint)
+    X(spectate_target, varuint)                                                \
+    X(squad, uint8)
 
 enum
 {
@@ -56,7 +57,8 @@ enum
     state_flags_petals_collected = 0b10000000,
     state_flags_petals = 0b100000000,
     state_flags_spectate_target = 0b1000000000,
-    state_flags_all = 0b1111111111
+    state_flags_squad = 0b10000000000,
+    state_flags_all = 0b11111111111
 };
 
 void rr_component_player_info_init(struct rr_component_player_info *this,
@@ -203,6 +205,7 @@ RR_DEFINE_PUBLIC_FIELD(player_info, EntityHash, flower_id);
 RR_DEFINE_PUBLIC_FIELD(player_info, EntityIdx, arena);
 RR_DEFINE_PUBLIC_FIELD(player_info, uint8_t, squad_pos);
 RR_DEFINE_PUBLIC_FIELD(player_info, EntityHash, spectate_target);
+RR_DEFINE_PUBLIC_FIELD(player_info, uint8_t, squad);
 #endif
 
 #ifdef RR_CLIENT

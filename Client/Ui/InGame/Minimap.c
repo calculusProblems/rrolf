@@ -144,6 +144,37 @@ static void minimap_on_render(struct rr_ui_element *this, struct rr_game *game)
         rr_renderer_fill(renderer);
         rr_renderer_stroke(renderer);
     }
+    if (arena->biome == rr_biome_id_pvp)
+    {
+        rr_renderer_set_stroke(renderer, 0xffff0000);
+        renderer->state.filter.amount = 0;
+        rr_renderer_set_fill(renderer, 0xffff0000);
+        for (uint32_t i = 0; i < RR_MAX_CLIENT_COUNT; ++i)
+        {
+            if (game->arena_player_infos[i] == RR_NULL_ENTITY)
+                continue;
+            struct rr_component_player_info *player_info =
+                rr_simulation_get_player_info(game->simulation,
+                                              game->arena_player_infos[i]);
+            if (player_info->arena != game->player_info->arena)
+                continue;
+            if (player_info->flower_id == RR_NULL_ENTITY)
+                continue;
+            struct rr_component_physical *physical =
+                rr_simulation_get_physical(game->simulation,
+                                           player_info->flower_id);
+            rr_renderer_begin_path(renderer);
+            rr_renderer_arc(
+                renderer,
+                this->abs_width *
+                    (physical->lerp_x / (grid_size * maze_dim) - 0.5),
+                this->abs_height *
+                    (physical->lerp_y / (grid_size * maze_dim) - 0.5),
+                4);
+            rr_renderer_fill(renderer);
+            rr_renderer_stroke(renderer);
+        }
+    }
 }
 
 static void minimap_redraw(void *captures)

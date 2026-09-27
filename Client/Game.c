@@ -1386,11 +1386,25 @@ void player_info_finder(struct rr_game *this)
 {
     struct rr_simulation *simulation = this->simulation;
     uint8_t counter = 1;
+    uint8_t other_counter = 0;
     memset(&this->player_infos, 0, sizeof this->player_infos);
+    memset(&this->arena_player_infos, 0, sizeof this->arena_player_infos);
     this->player_infos[0] = this->player_info->parent_id;
     for (EntityIdx i = 0; i < simulation->player_info_count; ++i)
-        if (simulation->player_info_vector[i] != this->player_info->parent_id)
-            this->player_infos[counter++] = simulation->player_info_vector[i];
+    {
+        EntityIdx p_id = simulation->player_info_vector[i];
+        if (p_id == this->player_info->parent_id)
+            continue;
+        struct rr_component_player_info *p_info =
+            rr_simulation_get_player_info(simulation, p_id);
+        if (p_info->squad == this->player_info->squad)
+        {
+            if (counter < RR_SQUAD_MEMBER_COUNT)
+                this->player_infos[counter++] = p_id;
+        }
+        else if (other_counter < RR_MAX_CLIENT_COUNT)
+            this->arena_player_infos[other_counter++] = p_id;
+    }
 }
 
 static void write_serverbound_packet_desktop(struct rr_game *this)

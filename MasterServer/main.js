@@ -35,9 +35,8 @@ const CLOUD_TOKEN = "cloud.eyJ0eXAiOiJKV1QiLCJhbGciOiJFZERTQSJ9.CKOM_-XtMRCjtLqo
 const NAMESPACE_ID = "04cfba67-e965-4899-bcb9-b7497cc6863b";
 const SERVER_SECRET = "ad904nf3adrgnariwpanyf3qap8unri4t9b384wna3g34ytgdr4bwtvd4y";
 
-//TODO: CAHNGE BACK TO REAL AND ALSO SET OAUT_REDIRECT_URI to rysteria.pro
-const CLIENT_ID = "1242286155320393859";
-const OAUTH_REDIRECT_URI = process.env["OAUTH_REDIRECT_URI"] || "https://game.parshwa.blog";
+const CLIENT_ID = "1453525695228678349";
+const OAUTH_REDIRECT_URI = process.env["OAUTH_REDIRECT_URI"] || "https://rysteria.pro";
 const CLIENT_SECRET = process.env["CLIENT_SECRET"] || "";
 const BOT_TOKEN = process.env["BOT_TOKEN"] || "";
 const MAX_PETAL_COUNT = 28;
@@ -126,7 +125,7 @@ function apply_missing_defaults(account)
         petals: {"1:0": 5},
         failed_crafts: {},
         mob_gallery: {},
-        checkpoint: 0,
+        checkpoint: { hell_creek: 0, pvp: 0 },
         discord_id: "",
         // inflated_up_to: 1,
     };
@@ -144,6 +143,14 @@ function apply_missing_defaults(account)
             delete account[prop];
         }
     }
+
+    if (typeof account.checkpoint === "number") {
+        account.checkpoint = { hell_creek: account.checkpoint, pvp: 0 };
+    }
+    if (!account.checkpoint.hasOwnProperty("hell_creek"))
+        account.checkpoint.hell_creek = 0;
+    if (!account.checkpoint.hasOwnProperty("pvp"))
+        account.checkpoint.pvp = 0;
 
     // if (account.inflated_up_to < MAX_PETAL_COUNT)
     // {
@@ -537,7 +544,10 @@ wss.on("connection", (ws, req) => {
                     break;
                 const user = connected_clients[uuid].user;
                 user.xp = decoder.ReadFloat64();
-                user.checkpoint = decoder.ReadUint8();
+                user.checkpoint = {
+                    hell_creek: decoder.ReadUint8(),
+                    pvp: decoder.ReadUint8(),
+                };
                 user.petals = {};
                 user.failed_crafts = {};
                 user.mob_gallery = {};

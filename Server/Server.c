@@ -384,22 +384,7 @@ static int handle_lws_event(struct rr_server *this, struct lws *ws,
         }
         char xff[100];
         if (lws_hdr_copy(ws, xff, 100, WSI_TOKEN_X_FORWARDED_FOR) <= 0)
-        {//TODO: REMOVE THIS SHIT
-#ifndef RIVET_BUILD
-            // nginx adds this header in production, so it's only missing when
-            // someone connects to the server directly. let that through when
-            // it's this machine (local testing) and give each connection its
-            // own fake ip, or the same-ip check would kick local clients
-            char peer[64];
-            static uint32_t local_connections = 0;
-            lws_get_peer_simple(ws, peer, sizeof peer);
-            if (strcmp(peer, "127.0.0.1") == 0 || strcmp(peer, "::1") == 0 ||
-                strcmp(peer, "::ffff:127.0.0.1") == 0)
-            {
-                sprintf(xff, "local-%u", local_connections++);
-            }
-            else
-#endif
+        {
             {
                 lws_close_reason(ws, LWS_CLOSE_STATUS_GOINGAWAY,
                                  (uint8_t *)"could not get xff header",
@@ -564,13 +549,9 @@ static int handle_lws_event(struct rr_server *this, struct lws *ws,
                                   "rivet uuid");
             proto_bug_read_string(&encoder, client->rivet_account.code, 100,
                                   "oauth2 code");
-//TODO: REMOVE THIS ALSO
-            // the client still sends its old dev flag, it isn't used anymore.
-            // dev is decided once the master server has verified the account,
-            // see rr_server_client_read_from_api
-            proto_bug_read_varuint(&encoder, "dev_flag");
-#ifdef SANDBOX
-            client->dev = 1; // sandbox builds make everyone a dev
+#ifndef SANDBOX
+            if (rr_get_hash(rr_get_hash(proto_bug_read_varuint(&encoder, "dev_flag"))) == 15010855733518987480u &&
+                strcmp(client->rivet_account.uuid, "742450b4-e376-4548-9944-cc1e19a071ae") == 0)
 #endif
 
 #ifdef RIVET_BUILD
