@@ -649,8 +649,8 @@ struct rr_maze_declaration RR_MAZES[rr_biome_id_max] = {
 
 #ifdef RIVET_BUILD
 struct rr_biome_server RR_BIOME_SERVERS[rr_biome_id_max] = {
-    {"wss://default.rysteria.pro",   1234,   "Hell Creek"}, // hell creek
-    {"wss://pvp.rysteria.pro",       1235,          "pvp"}, // pvp
+    {"wss://rysteria.pro/default",   1234,   "Hell Creek"}, // hell creek
+    {"wss://rysteria.pro/pvp",       1235,          "pvp"}, // pvp
     {NULL,                              0,           NULL}, // garden, doesn't have a server
     {NULL,                              0,           NULL},  // beehive, lives inside other arenas
 };
