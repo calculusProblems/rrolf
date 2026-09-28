@@ -52,6 +52,7 @@ void rr_component_flower_init(struct rr_component_flower *this,
 
 #ifdef RR_SERVER
 #include <math.h>
+#include <stdlib.h>
 
 #include <Server/Client.h>
 #include <Server/EntityAllocation.h>
@@ -105,11 +106,38 @@ void rr_component_flower_set_dead(struct rr_component_flower *this,
         rr_component_health_set_health(health, 0);
         health->gradually_healed = 0;
         health->gradually_healed_ticks = 0;
+#ifdef PVP
         if (arena->pvp)
         {
-            uint8_t drop_rarity = this->level / ;
+            uint8_t drop_rarity = this->level / 15;
+            if (drop_rarity > rr_rarity_id_epic)
+                drop_rarity = rr_rarity_id_epic;
+            for (uint8_t r = rr_rarity_id_unusual; r <= rr_rarity_id_mythic;
+                 ++r)
+                if (player_info->client->pvp_points >=
+                    RR_PVP_POINTS_PER_RARITY[r])
+                    ++drop_rarity;
             if (drop_rarity > rr_rarity_id_mythic)
                 drop_rarity = rr_rarity_id_mythic;
+
+            if (rr_simulation_entity_alive(simulation, health->last_attacker) &&
+                rr_simulation_has_player_info(simulation, health->last_attacker))
+            {
+                struct rr_component_player_info *killer_info =
+                    rr_simulation_get_player_info(simulation,
+                                                  health->last_attacker);
+                if (killer_info->client != NULL &&
+                    killer_info->client != player_info->client)
+                {
+                    uint64_t stolen = player_info->client->pvp_points * 3 / 4;
+                    killer_info->client->pvp_points += stolen;
+                    player_info->client->pvp_points -= stolen;
+                }
+            }
+            rr_pvp_bank_points(simulation->server,
+                               player_info->client->rivet_account.uuid,
+                               player_info->client->pvp_points);
+            player_info->client->pvp_points = 0;
             for (uint8_t squad = 0; squad < RR_SQUAD_COUNT; ++squad)
             {
                 if (health->squad_damage_counter[squad] <=
@@ -152,6 +180,7 @@ void rr_component_flower_set_dead(struct rr_component_flower *this,
                                                 rr_simulation_team_id_players);
             }
         }
+#endif
     }
     else
     {

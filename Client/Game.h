@@ -106,7 +106,14 @@ struct rr_game_cache
     uint8_t hold_defense;
     uint8_t show_loot;
     uint8_t disable_leave_hotkey;
+    uint8_t show_leaderboard;
     char nickname[128];
+};
+
+struct rr_leaderboard_entry
+{
+    char nickname[16];
+    uint64_t points;
 };
 
 struct rr_game_squad
@@ -199,6 +206,11 @@ struct rr_game
     uint64_t dev_flag;
     float lerp_delta;
     uint16_t afk_ticks;
+
+    struct rr_leaderboard_entry leaderboard[10];
+    uint8_t leaderboard_count;
+    uint32_t leaderboard_own_rank;
+    uint64_t leaderboard_own_points;
 
     uint8_t socket_ready : 1;
     uint8_t socket_pending : 1;

@@ -64,7 +64,8 @@ enum rr_clientbound_packet_header
     rr_clientbound_squad_leave,
     rr_clientbound_account_result,
     rr_clientbound_craft_result,
-    rr_clientbound_oauth2_data
+    rr_clientbound_oauth2_data,
+    rr_clientbound_leaderboard_update
 };
 
 enum rr_dev_cheat_type
@@ -243,6 +244,10 @@ extern double RR_GARDEN_MOB_ID_RARITY_COEFFICIENTS[rr_mob_id_max];
 
 extern uint32_t RR_RARITY_COLORS[rr_rarity_id_max];
 extern char const *RR_RARITY_NAMES[rr_rarity_id_max];
+
+#ifdef PVP
+extern uint64_t RR_PVP_POINTS_PER_RARITY[rr_rarity_id_max];
+#endif
 
 struct rr_maze_grid
 {

@@ -234,6 +234,11 @@ char const *RR_RARITY_NAMES[rr_rarity_id_max] = {
     "Common",    "Unusual", "Rare",   "Epic",
     "Legendary", "Mythic",  "Exotic", "Ancient"};
 
+#ifdef PVP
+uint64_t RR_PVP_POINTS_PER_RARITY[rr_rarity_id_max] = {
+    20, 100, 1000, 10000, 150000, 2250000, 45000000, 450000000};
+#endif
+
 double RR_MOB_WAVE_RARITY_COEFFICIENTS[rr_rarity_id_max + 1] = {
     0, 1, 6, 10, 15, 25, 160, 1200, 250};
 
