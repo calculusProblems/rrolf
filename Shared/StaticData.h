@@ -259,6 +259,9 @@ struct rr_maze_grid
     float local_difficulty;
     float overload_factor;
 #endif
+#ifdef PVP
+    bool skip = false;
+#endif
     uint8_t value;
     float difficulty;
 };
