@@ -657,7 +657,7 @@ struct rr_maze_declaration RR_MAZES[rr_biome_id_max] = {
     {MAZE_ENTRY(BURROW, 512), 0},
 };
 
-#ifdef RYSTERIA_BUILD
+#ifdef RYSTERIA
 struct rr_biome_server RR_BIOME_SERVERS[rr_biome_id_max] = {
     {"wss://rysteria.pro/default",   1234,   "Hell Creek"}, // hell creek
     {"wss://rysteria.pro/pvp",       1235,          "pvp"}, // pvp
